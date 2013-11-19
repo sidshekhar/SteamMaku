@@ -23,7 +23,7 @@ FLAGS = -I +threads -I shared -I team -I game
 LIBS  = unix.cma threads.cma str.cma
 
 top: shared/shared.cma
-	rlwrap ocaml $(FLAGS) $(LIBS) $^
+	ocaml $(FLAGS) $(LIBS) $^
 
 gui:
 	java -jar gui/gui_client.jar
