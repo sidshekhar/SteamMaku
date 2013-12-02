@@ -1,18 +1,27 @@
 open Definitions
 open Constants
 open Util
+open State
 
 (* TODO: change this *)
-type game = int ref
+type dirs = {p_red: (direction * direction) list; p_blue: (direction * direction) list}
+type game = {game_d: game_data; directions: dirs; time_passed: int}
 
 let init_game () : game =
-  failwith "U.N. Owen wasn't her"
+  let d = {p_red = []; p_blue = []} in
+  {game_d= game_dt; directions= d; time_passed= 0}
 
+(* called every timestep to update the server's game object  *)
 let handle_time game =
-  failwith "Charisma BREAK"
+  failwith "what time is it"
+
 
 let handle_action game col act =
-  failwith "A myon sort of day"
+  match act with
+  | Move (h::t) -> failwith ""
+  | Shoot (a,b,c) -> failwith ""
+  | Focus b -> failwith ""
+  | Bomb -> failwith ""
 
 let get_data game =
   failwith "I'm the strongest!"

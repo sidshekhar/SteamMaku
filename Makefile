@@ -23,7 +23,7 @@ FLAGS = -I +threads -I shared -I team -I game
 LIBS  = unix.cma threads.cma str.cma
 
 top: shared/shared.cma
-	ocaml $(FLAGS) $(LIBS) $^
+	rlwrap ocaml $(FLAGS) $(LIBS) $^
 
 gui:
 	java -jar gui/gui_client.jar
@@ -58,6 +58,7 @@ team/babybot.exe:         \
 game/game.exe:               \
 	shared/shared.cma    \
 	game/netgraphics.cmo \
+	game/state.cmo			 \
 	game/game.cmo        \
 	game/server.cmo
 
