@@ -1,0 +1,5 @@
+* 1st step: How is type game defined? Type game should store the state of the game
+* We need a state.ml kind of module that handles all the details of the game's state
+* 
+
+* We are keeping a type dirs to store the players' currently enqueued direction list
