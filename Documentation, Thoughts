@@ -3,3 +3,12 @@
 * 
 
 * We are keeping a type dirs to store the players' currently enqueued direction list
+
+if (player_not_invincible) then
+  clear_all_bullets;
+  deduct life;
+  power = power/2;
+  bombs = cINITIAL_BOMBS;
+  opponents.score += CKILL_POINTS;
+  player_set_invincible
+else ()

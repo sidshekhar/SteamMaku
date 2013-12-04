@@ -3,6 +3,18 @@ include Constants
 include Definitions
 
 
+type dirs = {
+  p_red: (direction * direction) list; 
+  p_blue: (direction * direction) list
+}
+
+type game = {
+  mutable game_d: game_data; 
+  mutable directions: dirs;
+  mutable invincible: (bool * bool); (* (red,blue) *)
+  mutable time_passed: int
+}
+
 
 let init_player (col:color) : player_char =
   match col with
@@ -30,19 +42,121 @@ let team_blue = init_team Blue
 
 let game_dt : game_data = (team_red, team_blue, [], [], [])
 
-let update_bullets b_list = failwith ""
+let update_bullets' (b:bullet) =
+ let old_pos = b.b_pos in
+  let old_vel = b.b_vel in
+  {b with b_pos= (add_v old_pos old_vel); b_vel= (add_v old_vel b.b_accel)}
 
-let update_UFOs u_list = failwith ""
 
-let update_players b = failwith ""
+let update_bullets b_list : unit= 
+  List.filter (fun b -> in_bounds b.b_pos) (List.fold_left (fun acc x -> (update_bullets' x)::acc) [] b_list);
+  ()
 
-let collide_bullets_players b_list plyrs = failwith ""
 
-let collide_bullets_UFOs b_list u_list = failwith ""
+let update_UFOs' (u:ufo) = failwith ""
+(*  let old_pos = u.u_pos in
+  let old_vel = u.u_vel in
+  {u with u_pos= (add_v old_pos old_vel); u_vel= (add_v old_vel u.u_accel)}
+*)
 
-let process_UFO_hits bu_list = failwith ""
+let update_UFOs u_list = ()
+(*  List.filter (fun u -> in_bounds u.u_pos) (List.fold_left (fun acc x -> (update_UFOs' x)::acc) [] u_list);
+  ()
+*)
 
-let process_player_hits bp_list = failwith ""
+let update_players p dir = 
+  if p.p_focused
+    then let vect = vector_of_dirs dir (float_of_int cFOCUSED_SPEED) in
+    {p with p_pos= (add_v p.p_pos vect)}; ()
+  else
+    let vect = vector_of_dirs dir (float_of_int cUNFOCUSED_SPEED) in
+    {p with p_pos= (add_v p.p_pos vect)}; ()
+
+
+let intersect c1 c2 =
+  let (p1,r1) = c1 in
+  let (p2,r2) = c2 in
+  (distance p1 p2) <= (r1 +. r2)
+
+let collide_bp (b:bullet) (p:player_char) =
+  let c1 = (b.b_pos, float_of_int b.b_radius) in
+  let c2 = (p.p_pos, float_of_int p.p_radius) in
+  b.b_color != p.p_color && 
+  intersect c1 c2
+
+let graze' c1 c2 =
+  let (p1,r1) = c1 in
+  let (p2,r2) = c2 in
+  (distance p1 p2) <= (r1 +. r2 +. (float_of_int cGRAZE_RADIUS))
+
+let graze_bp (b:bullet) (p:player_char) =
+  let c1 = (b.b_pos, float_of_int b.b_radius) in
+  let c2 = (p.p_pos, float_of_int p.p_radius) in
+  b.b_color != p.p_color && 
+  graze' c1 c2
+
+
+let collide_bullets_players b_list p = 
+  List.fold_left (fun acc x -> if (collide_bp x p) then (x,p,false)::acc 
+                               else if (graze_bp x p) then (x,p,true)::acc else acc) [] b_list
+
+let collide_bu b u =
+  let c1 = (b.b_pos, float_of_int b.b_radius) in
+  let c2 = (u.u_pos, float_of_int u.u_radius) in
+  intersect c1 c2
+
+let collide_bu' b_list u =
+  List.fold_left (fun acc x -> if (collide_bu x u) then (x,u)::acc else acc) [] b_list
+
+let collide_bullets_UFOs b_list u_list = 
+  List.fold_left (fun acc x -> (collide_bu' b_list x) @ acc) [] u_list
+
+(* given the game state and a player,this will tell you if she is invincible *)
+let isInvincible (pl:player_char) (gm:game) =
+  match pl.p_color with
+  | Red -> (fst gm.invincible)
+  | Blue -> (snd gm.invincible)
+  
+(*
+(* clears all bullets from the given game *)
+let clear_all_bullets (gm:game) =
+  let gdata = gm.game_d in
+  let (tr,tb,ul,bl,pwl) = gdata in
+  gm.game_d <- (tr,tb,ul,[],pwl)
+
+let deduct_life pl (gm:game) : unit = 
+  let gdata = gm.game_d in
+  let (tr,tb,ul,bl,pwl) = gdata in
+    match pl.p_color with
+    | Red -> let (l,b,s,pw,c,pl) = tr in 
+      gm.game_d <- ((l-1,b,s,pw,c,pl),tb,ul,bl,pwl)
+    | Blue -> let (l,b,s,pw,c,pl) = tb in 
+      gm.game_d <- (tr,(l-1,b,s,pw,c,pl),ul,bl,pwl)
+*)
+
+let process_UFO_hits gamedata bu_list = failwith ""
+
+(* deduct loser's life, clear all bullets, power/2, init bombs, winner's score *)
+let scoring gm winner_col : unit = 
+  let gdata = gm.game_d in
+  let (tr, tb, ul, bl, pwl) = gdata in
+    match winner_col with
+    | Red -> 
+      let (l1,b1,s1,pw1,c1,pl1) = tr in
+      let (l2,b2,s2,pw2,c2,pl2) = tb in
+      gm.game_d <- ((l1,b1,s1+cKILL_POINTS,pw1,c1,pl1),
+                    (l2-1,cINITIAL_BOMBS,s2,pw2/2,c2,pl2), ul, [], pwl);
+      gm.invincible <- (true, isInvincible pl2 gm)
+    | Blue ->
+      let (l1,b1,s1,pw1,c1,pl1) = tr in
+      let (l2,b2,s2,pw2,c2,pl2) = tb in
+      gm.game_d <- ((l1-1,cINITIAL_BOMBS,s1,pw1/2,c1,pl1),
+                    (l2,b2,s2+cKILL_POINTS,pw2,c2,pl2), ul, [], pwl);
+      gm.invincible <- (isInvincible pl1 gm, true)
+
+
+
+let process_player_hits gm bp_list = failwith ""
 
 let process_player_power () = failwith ""
 

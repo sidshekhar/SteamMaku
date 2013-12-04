@@ -18,19 +18,19 @@ val update_bullets: bullet list -> unit
 val update_UFOs: ufo list -> unit
 
 (* update positions of all players, taking into account their desired direction and movement mode *)
-val update_players: (player_char * player_char) -> unit
+val update_players: player_char -> (direction * direction) -> unit
 
 (* compile a list of all bullet/player collisions (including grazes) *)
-val collide_bullets_players: bullet list -> (player_char * player_char) -> (bullet * player_char) list
+val collide_bullets_players: bullet list -> player_char -> (bullet * player_char * bool) list
 
 (* compile a list of all bullet/UFO collisions  *)
 val collide_bullets_UFOs: bullet list -> ufo list -> (bullet * ufo) list
 
 (* process each UFO hit, if destroyed remove and add powers appropriately *)
-val process_UFO_hits: (bullet * ufo) list -> unit
+val process_UFO_hits: Game.game -> (bullet * ufo) list -> unit
 
 (* process each player hit, add graze points for grazes *)
-val process_player_hits: (bullet * player_char) list -> unit
+val process_player_hits: Game.game ->  (bullet * player_char * bool) list -> unit
 
 (* check player/power collisions, process power collection *)
 val process_player_power: unit -> unit
