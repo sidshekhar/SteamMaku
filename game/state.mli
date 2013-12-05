@@ -2,6 +2,18 @@ open Definitions
 open Constants
 
 
+type dirs = {
+  mutable p_red: (direction * direction) list; 
+  mutable p_blue: (direction * direction) list
+}
+
+type game = {
+  mutable game_d: game_data;
+  mutable directions: dirs;
+  mutable invincible: (bool * bool); (* (red,blue) *)
+  mutable time_passed: float
+}
+
 (* Team data, (each stores a player of course) *)
 val team_red: team_data
 val team_blue: team_data
@@ -27,16 +39,19 @@ val collide_bullets_players: bullet list -> player_char -> (bullet * player_char
 val collide_bullets_UFOs: bullet list -> ufo list -> (bullet * ufo) list
 
 (* process each UFO hit, if destroyed remove and add powers appropriately *)
-val process_UFO_hits: Game.game -> (bullet * ufo) list -> unit
+val process_UFO_hits: game -> (bullet * ufo) list -> unit
 
 (* process each player hit, add graze points for grazes *)
-val process_player_hits: Game.game ->  (bullet * player_char * bool) list -> unit
+val process_player_hits: game -> (bullet * player_char * bool) list -> unit
+
+(* compile a list of all player/power collisions *)
+val collide_players_power: player_char -> power -> (player_char * power) list
 
 (* check player/power collisions, process power collection *)
 val process_player_power: unit -> unit
 
 (* check if the game has now ended. Could be by time runnning out or by one player having zero lives left *)
-val check_game_ended: unit -> bool
+val check_game_ended: game -> result
 
 
 (* ========================================================================== *)
