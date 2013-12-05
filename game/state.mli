@@ -30,7 +30,7 @@ val update_bullets: bullet list -> unit
 val update_UFOs: ufo list -> unit
 
 (* update positions of all players, taking into account their desired direction and movement mode *)
-val update_players: player_char -> (direction * direction) -> unit
+val update_players: player_char -> (direction * direction) -> player_char
 
 (* compile a list of all bullet/player collisions (including grazes) *)
 val collide_bullets_players: bullet list -> player_char -> (bullet * player_char * bool) list

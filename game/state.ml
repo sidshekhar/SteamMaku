@@ -1,6 +1,7 @@
 include Util
 include Constants
 include Definitions
+include Netgraphics
 
 
 type dirs = {
@@ -17,16 +18,20 @@ type game = {
 
 let init_player (col:color) : player_char =
   match col with
-  | Red -> {p_id = 0;
+  | Red -> let pl = {
+            p_id = next_available_id ();
             p_pos = (((float_of_int cBOARD_WIDTH) /. 8.), (float_of_int cBOARD_HEIGHT) /. 2.); 
             p_focused = false;
             p_radius = cHITBOX_RADIUS;
-            p_color = Red}
-  | Blue -> {p_id = 1;
+            p_color = Red} in
+            add_update (AddPlayer(pl.p_id, pl.p_color, pl.p_pos)); pl
+  | Blue -> let pl = {
+            p_id = next_available_id ();
             p_pos = ((((float_of_int cBOARD_WIDTH) *. 7.) /. 8.), (float_of_int cBOARD_HEIGHT) /. 2.); 
             p_focused = false;
             p_radius = cHITBOX_RADIUS;
-            p_color = Blue}
+            p_color = Blue} in
+            add_update (AddPlayer(pl.p_id, pl.p_color, pl.p_pos)); pl
 
 let init_team (col:color) : team_data =
   match col with
@@ -65,12 +70,14 @@ let update_UFOs u_list = ()
 
 
 let update_players p dir = 
-  if p.p_focused
-    then let vect = vector_of_dirs dir (float_of_int cFOCUSED_SPEED) in
-    {p with p_pos= (add_v p.p_pos vect)}; ()
-  else
-    let vect = vector_of_dirs dir (float_of_int cUNFOCUSED_SPEED) in
-    {p with p_pos= (add_v p.p_pos vect)}; ()
+  begin
+    if p.p_focused
+      then let vect = vector_of_dirs dir (float_of_int cFOCUSED_SPEED) in
+      {p with p_pos = (add_v p.p_pos vect)}
+    else
+      let vect = vector_of_dirs dir (float_of_int cUNFOCUSED_SPEED) in
+      {p with p_pos = (add_v p.p_pos vect)}
+  end
 
 
 let intersect c1 c2 =
@@ -178,7 +185,16 @@ let process_player_hits gm (bp_list:(Definitions.bullet * Definitions.player_cha
     (fun acc x -> 
       let (b,p,g) = x in
         scoring acc (flip_color b.b_color) g; acc) gm bp_list
-  end; ()
+  end;
+  let gdata = gm.game_d in
+  let (tr,tb,ul,bl,pwl) = gdata in
+  let (l1,b1,s1,pw1,c1,pl1) = tr in
+  let (l2,b2,s2,pw2,c2,pl2) = tb in
+  add_update (SetLives(Red, l1)); 
+  add_update (SetLives(Blue, l2));
+  add_update (SetScore(Red, s1)); 
+  add_update (SetScore(Blue, s2));
+  ()
 
 
 let rec remove_power pw plist = 
