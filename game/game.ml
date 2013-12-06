@@ -3,6 +3,8 @@ open Constants
 open Util
 open Netgraphics
 open State
+include State
+include Util
 
 (*
 type dirs = {
@@ -108,12 +110,25 @@ let handle_time game =
 
 
 let handle_action game col act =
+  let gdata = game.game_d in
+  let (tr, tb, ul, bl, pwl) = gdata in
+  let (l1,b1,s1,pw1,c1,pl1) = tr in
+  let (l2,b2,s2,pw2,c2,pl2) = tb in
   match act with
   | Move l -> 
     if (col == Red) 
       then begin dirs.p_red <- l; game.directions <- dirs; game end
     else begin dirs.p_blue <- l; game.directions <- dirs; game end
-  | Shoot (a,b,c) -> failwith "Not shooting yet"
+  |Shoot (shot_type,target_loc,accel) -> if col == Red then 
+     begin match shot_type with
+    |Bubble ->  let newbulletlst = [{b_id = next_available_id (); b_type = Bubble; b_pos = pl1.p_pos; b_vel = init_velocity target_loc pl1.p_pos cBUBBLE SPEED; 
+                       b_accel = if accel < cACCEL LIMIT then accel else (0., 0.,); b_radius = cBUBBLE RADIUS; b_col = Red}]::bl in 
+                       let newgdata = (tr, tb, ul, newbulletlst, pwl) in 
+                       game.game_d <- newgdata 
+    |Trail -> 
+    |Spread -> 
+  end
+
   | Focus b -> let (rd,bl) = game.invincible in
       if (col == Red) then begin game.invincible <- (b,bl); game end
       else begin game.invincible <- (rd,b); game end

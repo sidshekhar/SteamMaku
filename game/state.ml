@@ -1,3 +1,4 @@
+open Util 
 include Util
 include Constants
 include Definitions
@@ -241,11 +242,39 @@ else
       if (!(tr.hasLives)) and (!(tb.hasLives)) then Tie
       else Unfinished
 
-
-
-
-
  *)
+
+let create_bullets (btype : bullet_type) (c : [bullet]) (pos : position)  =
+  match btype with
+  |Bubble -> let c = [{b_id = next_available_id (); b_type = Bubble; b_pos = pos; b_vel = }
+  |Power ->
+  |Trail ->
+  |Spread ->
+
+
+let init_velocity (targetpos : position) (initpos : position) (speed : int)=
+  match targetpos initpos with 
+  | (x, y) (a, b) -> (unit_v(x - a, y - b)) * speed
+
+  let trail_creator col accel =  
+        let gdata = game.game_d in
+        let (tr, tb, ul, bl, pwl) = gdata in
+        let (l1,b1,s1,pw1,c1,pl1) = tr in
+        let (l2,b2,s2,pw2,c2,pl2) = tb in
+                      let bulletlst = [] in
+                      if col == Red then
+                      let t = ref 1
+                      in
+                      while !t < 4 do 
+                      let i = ref 1 in
+                      while !i < (cTRAIL_NUM + 1) do 
+                      let newbullet = {b_id = next_available_id (); b_type = Trail; b_pos = pl1.p_pos; b_vel = init_velocity target_loc pl1.p_pos (cTRAIL_SPEED_STEP * !i); 
+                       b_accel = if accel < cACCEL LIMIT then accel else (0., 0.,); b_radius = cTRAIL_RADIUS; b_col = Red}::bulletlst
+
+
+
+
+
 
 let move_player dd_list = failwith ""
 
