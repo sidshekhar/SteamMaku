@@ -62,3 +62,6 @@ val init_velocity: position -> position -> int -> velocity
 
 (* returns the initial velocity of a spread bullet  *)
 val init_velocity_spread: position -> position -> int -> int -> velocity
+
+(* creates a list of spread bullets and returns the new game data *)
+val trail_creator: game -> color -> vector -> vector -> unit

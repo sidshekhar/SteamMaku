@@ -261,48 +261,46 @@ let init_velocity_spread (target:position) (initpos:position) (speed:int) (num:i
   | _ -> vel
 
 
-
-
-  let trail_creator game col accel target_loc =  
-        let gdata = game.game_d in
-        let (tr, tb, ul, bl, pwl) = gdata in
-        let (l1,b1,s1,pw1,c1,pl1) = tr in
-        let (l2,b2,s2,pw2,c2,pl2) = tb in
-        let bulletlst = [] in
-        if col == Red then let t = ref 1 in
-          while !t < 4 do 
-            let i = ref 1 in
-              while !i < (cTRAIL_NUM + 1) do 
-                let newbullet = {
-                b_id = next_available_id ();
-                b_type = Trail;
-                b_pos = pl1.p_pos;
-                b_vel = init_velocity_spread target_loc pl1.p_pos (cTRAIL_SPEED_STEP * !i) (!t);
-                b_accel = if (magnitude accel) < cACCEL_LIMIT then accel else (0., 0.);
-                b_radius = cTRAIL_RADIUS;
-                b_color = Red}::bulletlst in
-                i := !i + 1;
-              done;
-            t := !t + 1;
-          done;
-          let ngdata = (tr,tb,ul,(bl @ bulletlst), pwl) in
-          game.game_d <- ngdata;
-        else
-          let t = ref 1 in
-          while !t < 4 do 
-            let i = ref 1 in
-              while !i < (cTRAIL_NUM + 1) do 
-                let newbullet = {
-                b_id = next_available_id ();
-                b_type = Trail;
-                b_pos = pl2.p_pos;
-                b_vel = init_velocity_spread target_loc pl2.p_pos (cTRAIL_SPEED_STEP * !i) (!t);
-                b_accel = if (magnitude accel) < cACCEL_LIMIT then accel else (0., 0.);
-                b_radius = cTRAIL_RADIUS;
-                b_color = Blue}::bulletlst in
-                i := !i + 1;
-              done;
-            t := !t + 1;
-          done;
-          let ngdata = (tr,tb,ul,(bl @ bulletlst), pwl) in
-          game.game_d <- ngdata;
+let trail_creator game col accel target_loc =  
+      let gdata = game.game_d in
+      let (tr, tb, ul, bl, pwl) = gdata in
+      let (l1,b1,s1,pw1,c1,pl1) = tr in
+      let (l2,b2,s2,pw2,c2,pl2) = tb in
+      let bulletlst = [] in
+      if col == Red then let t = ref 1 in
+        while !t < 4 do 
+          let i = ref 1 in
+            while !i < (cTRAIL_NUM + 1) do 
+              let newbullet = {
+              b_id = next_available_id ();
+              b_type = Trail;
+              b_pos = pl1.p_pos;
+              b_vel = init_velocity_spread target_loc pl1.p_pos (cTRAIL_SPEED_STEP * !i) (!t);
+              b_accel = if (magnitude accel) < cACCEL_LIMIT then accel else (0., 0.);
+              b_radius = cTRAIL_RADIUS;
+              b_color = Red}::bulletlst in
+              i := !i + 1;
+            done;
+          t := !t + 1;
+        done;
+        let ngdata = (tr,tb,ul,(bl @ bulletlst), pwl) in
+        game.game_d <- ngdata;
+      else
+        let t = ref 1 in
+        while !t < 4 do 
+          let i = ref 1 in
+            while !i < (cTRAIL_NUM + 1) do 
+              let newbullet = {
+              b_id = next_available_id ();
+              b_type = Trail;
+              b_pos = pl2.p_pos;
+              b_vel = init_velocity_spread target_loc pl2.p_pos (cTRAIL_SPEED_STEP * !i) (!t);
+              b_accel = if (magnitude accel) < cACCEL_LIMIT then accel else (0., 0.);
+              b_radius = cTRAIL_RADIUS;
+              b_color = Blue}::bulletlst in
+              i := !i + 1;
+            done;
+          t := !t + 1;
+        done;
+        let ngdata = (tr,tb,ul,(bl @ bulletlst), pwl) in
+        game.game_d <- ngdata;

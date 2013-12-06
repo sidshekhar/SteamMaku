@@ -130,7 +130,7 @@ let handle_action game col act =
             b_color = Red})::bl in 
             let newgdata = (tr, tb, ul, newbulletlst, pwl) in 
             game.game_d <- newgdata; game
-          | Trail -> failwith ""
+          | Trail -> trail_creator game col accel target_loc; game
           | Spread -> failwith ""
         end
      else begin match shot_type with
@@ -143,7 +143,7 @@ let handle_action game col act =
             b_color = Blue})::bl in 
             let newgdata = (tr, tb, ul, newbulletlst, pwl) in 
             game.game_d <- newgdata; game
-          | Trail -> failwith ""
+          | Trail -> trail_creator game col accel target_loc; game
           | Spread -> failwith ""
           end
 
