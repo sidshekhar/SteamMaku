@@ -57,12 +57,8 @@ val check_game_ended: game -> result
 (* ========================================================================== *)
 (*  handle_action "helper" functions *)
 
-(* Changes the enqueued moves of the player's character to whatever the argument is *)
-val move_player: (direction * direction) list -> unit
+(* returns the initial velocity of a bullet given the target and init positions *)
+val init_velocity: position -> position -> int -> velocity
 
-(* Performing shooting with the given bullet type, position and acceleration *)
-val shoot_com: (bullet_type * position * acceleration) -> unit
-
-(* Change the player's focus type to the value given *)
-val focus_player: bool -> unit
-
+(* returns the initial velocity of a spread bullet  *)
+val init_velocity_spread: position -> position -> int -> int -> velocity

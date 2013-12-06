@@ -244,40 +244,65 @@ else
 
  *)
 
-let create_bullets (btype : bullet_type) (c : [bullet]) (pos : position)  =
-  match btype with
-  |Bubble -> let c = [{b_id = next_available_id (); b_type = Bubble; b_pos = pos; b_vel = }
-  |Power ->
-  |Trail ->
-  |Spread ->
 
 
-let init_velocity (targetpos : position) (initpos : position) (speed : int)=
-  match targetpos initpos with 
-  | (x, y) (a, b) -> (unit_v(x - a, y - b)) * speed
+let init_velocity (targetpos : position) (initpos : position) (speed : int) =
+  match targetpos,initpos with 
+  | (x, y) -> scale (float_of_int speed) (unit_v (subt_v x y))
 
-  let trail_creator col accel =  
+
+(*   *)
+let init_velocity_spread (target:position) (initpos:position) (speed:int) (num:int) =
+  let vel = scale (float_of_int speed) (unit_v(subt_v target initpos)) in
+  match num with
+  | 1 -> rotate_deg vel (float_of_int (0 - cTRAIL_ANGLE))
+  | 2 -> vel
+  | 3 -> rotate_deg vel (float_of_int (cTRAIL_ANGLE))
+  | _ -> vel
+
+
+
+
+  let trail_creator game col accel target_loc =  
         let gdata = game.game_d in
         let (tr, tb, ul, bl, pwl) = gdata in
         let (l1,b1,s1,pw1,c1,pl1) = tr in
         let (l2,b2,s2,pw2,c2,pl2) = tb in
-                      let bulletlst = [] in
-                      if col == Red then
-                      let t = ref 1
-                      in
-                      while !t < 4 do 
-                      let i = ref 1 in
-                      while !i < (cTRAIL_NUM + 1) do 
-                      let newbullet = {b_id = next_available_id (); b_type = Trail; b_pos = pl1.p_pos; b_vel = init_velocity target_loc pl1.p_pos (cTRAIL_SPEED_STEP * !i); 
-                       b_accel = if accel < cACCEL LIMIT then accel else (0., 0.,); b_radius = cTRAIL_RADIUS; b_col = Red}::bulletlst
-
-
-
-
-
-
-let move_player dd_list = failwith ""
-
-let shoot_com tr = failwith ""
-
-let focus_player b = failwith ""
+        let bulletlst = [] in
+        if col == Red then let t = ref 1 in
+          while !t < 4 do 
+            let i = ref 1 in
+              while !i < (cTRAIL_NUM + 1) do 
+                let newbullet = {
+                b_id = next_available_id ();
+                b_type = Trail;
+                b_pos = pl1.p_pos;
+                b_vel = init_velocity_spread target_loc pl1.p_pos (cTRAIL_SPEED_STEP * !i) (!t);
+                b_accel = if (magnitude accel) < cACCEL_LIMIT then accel else (0., 0.);
+                b_radius = cTRAIL_RADIUS;
+                b_color = Red}::bulletlst in
+                i := !i + 1;
+              done;
+            t := !t + 1;
+          done;
+          let ngdata = (tr,tb,ul,(bl @ bulletlst), pwl) in
+          game.game_d <- ngdata;
+        else
+          let t = ref 1 in
+          while !t < 4 do 
+            let i = ref 1 in
+              while !i < (cTRAIL_NUM + 1) do 
+                let newbullet = {
+                b_id = next_available_id ();
+                b_type = Trail;
+                b_pos = pl2.p_pos;
+                b_vel = init_velocity_spread target_loc pl2.p_pos (cTRAIL_SPEED_STEP * !i) (!t);
+                b_accel = if (magnitude accel) < cACCEL_LIMIT then accel else (0., 0.);
+                b_radius = cTRAIL_RADIUS;
+                b_color = Blue}::bulletlst in
+                i := !i + 1;
+              done;
+            t := !t + 1;
+          done;
+          let ngdata = (tr,tb,ul,(bl @ bulletlst), pwl) in
+          game.game_d <- ngdata;

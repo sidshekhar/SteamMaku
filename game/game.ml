@@ -3,7 +3,6 @@ open Constants
 open Util
 open Netgraphics
 open State
-include State
 include Util
 
 (*
@@ -23,21 +22,21 @@ type game = {
 type dirs = State.dirs
 type game = State.game
 
-let dirs : dirs = {
-  p_red = [(North, East); (North, East)];
+let current_dirs : dirs = {
+  p_red = [];
   p_blue = []
 }
 
 
 let current_game : game = 
   {game_d = game_dt; 
-   directions = dirs;
+   directions = current_dirs;
    invincible = (false, false); 
    time_passed = 0.0}
 
 let init_game () : game =
    current_game.game_d <- game_dt; 
-   current_game.directions <- dirs;
+   current_game.directions <- current_dirs;
    current_game.invincible <- (false, false); 
    current_game.time_passed <- 0.0;
    current_game
@@ -45,8 +44,8 @@ let init_game () : game =
 let pop_direction dirlist col : (direction * direction) =
   match dirlist with
   | [] -> (Neutral, Neutral)
-  | h::t -> if col = Red then begin dirs.p_red <- t; h end
-            else begin dirs.p_blue <- t; h end
+  | h::t -> if col = Red then begin current_dirs.p_red <- t; h end
+            else begin current_dirs.p_blue <- t; h end
 
 
 let showPlayer p = 
@@ -103,8 +102,8 @@ let handle_time game =
   current_game.game_d <- game.game_d;
   current_game.directions <- game.directions;
   current_game.invincible <- game.invincible;
-  dirs.p_red <- game.directions.p_red;
-  dirs.p_blue <- game.directions.p_blue;
+  current_dirs.p_red <- game.directions.p_red;
+  current_dirs.p_blue <- game.directions.p_blue;
   current_game.time_passed <- game.time_passed;
   (game, result)
 
@@ -117,17 +116,36 @@ let handle_action game col act =
   match act with
   | Move l -> 
     if (col == Red) 
-      then begin dirs.p_red <- l; game.directions <- dirs; game end
-    else begin dirs.p_blue <- l; game.directions <- dirs; game end
-  |Shoot (shot_type,target_loc,accel) -> if col == Red then 
-     begin match shot_type with
-    |Bubble ->  let newbulletlst = [{b_id = next_available_id (); b_type = Bubble; b_pos = pl1.p_pos; b_vel = init_velocity target_loc pl1.p_pos cBUBBLE SPEED; 
-                       b_accel = if accel < cACCEL LIMIT then accel else (0., 0.,); b_radius = cBUBBLE RADIUS; b_col = Red}]::bl in 
-                       let newgdata = (tr, tb, ul, newbulletlst, pwl) in 
-                       game.game_d <- newgdata 
-    |Trail -> 
-    |Spread -> 
-  end
+      then begin current_dirs.p_red <- l; game.directions <- current_dirs; game end
+    else begin current_dirs.p_blue <- l; game.directions <- current_dirs; game end
+  | Shoot (shot_type,target_loc,accel) -> 
+      if col == Red 
+        then begin match shot_type with
+          | Bubble -> let newbulletlst = ({
+            b_id = next_available_id (); 
+            b_type = Bubble;
+            b_pos = pl1.p_pos;
+            b_vel = init_velocity target_loc pl1.p_pos cBUBBLE_SPEED;
+            b_accel = if (magnitude accel) < cACCEL_LIMIT then accel else (0., 0.); b_radius = cBUBBLE_RADIUS; 
+            b_color = Red})::bl in 
+            let newgdata = (tr, tb, ul, newbulletlst, pwl) in 
+            game.game_d <- newgdata; game
+          | Trail -> failwith ""
+          | Spread -> failwith ""
+        end
+     else begin match shot_type with
+          | Bubble -> let newbulletlst = ({
+            b_id = next_available_id (); 
+            b_type = Bubble;
+            b_pos = pl1.p_pos;
+            b_vel = init_velocity target_loc pl1.p_pos cBUBBLE_SPEED;
+            b_accel = if (magnitude accel) < cACCEL_LIMIT then accel else (0., 0.); b_radius = cBUBBLE_RADIUS; 
+            b_color = Blue})::bl in 
+            let newgdata = (tr, tb, ul, newbulletlst, pwl) in 
+            game.game_d <- newgdata; game
+          | Trail -> failwith ""
+          | Spread -> failwith ""
+          end
 
   | Focus b -> let (rd,bl) = game.invincible in
       if (col == Red) then begin game.invincible <- (b,bl); game end
