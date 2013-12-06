@@ -47,15 +47,15 @@ let team_blue = init_team Blue
 
 let game_dt : game_data = (team_red, team_blue, [], [], [])
 
-let update_bullets' (b:bullet) =
+let update_bullets' (b:bullet) : bullet =
  let old_pos = b.b_pos in
   let old_vel = b.b_vel in
+  add_update (MoveBullet(b.b_id, (add_v old_pos old_vel)));
   {b with b_pos= (add_v old_pos old_vel); b_vel= (add_v old_vel b.b_accel)}
 
 
-let update_bullets b_list : unit= 
-  List.filter (fun b -> in_bounds b.b_pos) (List.fold_left (fun acc x -> (update_bullets' x)::acc) [] b_list);
-  ()
+let update_bullets b_list : bullet list = 
+  List.filter (fun b -> in_bounds b.b_pos) (List.fold_left (fun acc x -> (update_bullets' x)::acc) [] b_list)
 
 
 let update_UFOs' (u:ufo) = failwith ""
@@ -192,6 +192,7 @@ let scoring gm winner_col grazed : unit =
         gm.game_d <- ((l1-1,cINITIAL_BOMBS,s1,pw1/2,c1,pl1),
                     (l2,b2,s2+cKILL_POINTS,pw2,c2,pl2), ul, [], pwl)
       end;
+
       gm.invincible <- (isInvincible pl1 gm, true)
 
 
@@ -242,22 +243,7 @@ let check_game_ended (gm:game) : result =
           then Tie
         else Unfinished
       
-    
-
-(*  
-
-if (time_passed > cTIME_LIMIT) and tr.hasLives and tb.hasLives 
-  then Tie
-else
-  if (!(tr.hasLives)) and tb.hasLives then Winner(Blue)
-  else 
-    if (!(tb.hasLives)) and tr.hasLives then Winner(Red)
-    else 
-      if (!(tr.hasLives)) and (!(tb.hasLives)) then Tie
-      else Unfinished
-
- *)
-
+  
 
 
 let init_velocity (targetpos : position) (initpos : position) (speed : int) =

@@ -26,7 +26,7 @@ val game_dt: game_data
 (*  handle_time "helper" functions *)
 
 (* Update positions and velocities of all bullets and UFOs *)
-val update_bullets: bullet list -> unit
+val update_bullets: bullet list -> bullet list
 val update_UFOs: ufo list -> unit
 
 (* update positions of all players, taking into account their desired direction and movement mode *)

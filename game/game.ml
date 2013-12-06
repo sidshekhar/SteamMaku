@@ -78,7 +78,7 @@ let handle_time game =
   let (l1,b1,s1,pw1,c1,pl1) = tr in
   let (l2,b2,s2,pw2,c2,pl2) = tb in
 
-  update_bullets bl;
+  let new_bl = update_bullets bl in
   update_UFOs ul;
 
   let new_pr = update_players pl1 (pop_direction game.directions.p_red Red) in
@@ -87,17 +87,27 @@ let handle_time game =
   add_update (MovePlayer(new_pr.p_id, new_pr.p_pos));
   add_update (MovePlayer(new_pb.p_id, new_pb.p_pos));
 
-  let bpr_collisions = collide_bullets_players bl new_pr in
-  let bpbl_collisions = collide_bullets_players bl new_pb in
-  let bufo_collisions = collide_bullets_UFOs bl ul in
+  let bpr_collisions = collide_bullets_players new_bl new_pr in
+  let bpbl_collisions = collide_bullets_players new_bl new_pb in
+  let bufo_collisions = collide_bullets_UFOs new_bl ul in
   process_player_hits game bpr_collisions;
   process_player_hits game bpbl_collisions;
   let result = check_game_ended game in
   game.time_passed <- game.time_passed +. cUPDATE_TIME;
   
-  let new_tr = (l1,b1,s1,pw1,update_charge tr Red,new_pr) in
-  let new_tb = (l2,b2,s2,pw2,update_charge tb Blue,new_pb) in
-  let new_gdata = (new_tr, new_tb, ul, bl, pwl) in
+  let new_rc = update_charge tr Red in
+  let new_rb = update_charge tr Blue in
+  let new_tr = (l1,b1,s1,pw1,new_rc,new_pr) in
+  let new_tb = (l2,b2,s2,pw2,new_rb,new_pb) in
+  let new_gdata = (new_tr, new_tb, ul, new_bl, pwl) in
+
+  add_update (SetBombs(Red, b1));
+  add_update (SetBombs(Blue, b2));
+  add_update (SetCharge(Red, new_rc));
+  add_update (SetCharge(Blue, new_rb));
+  add_update (SetPower(Red, pw1));
+  add_update (SetPower(Blue, pw2));
+
   game.game_d <- new_gdata;
   current_game.game_d <- game.game_d;
   current_game.directions <- game.directions;
@@ -128,7 +138,7 @@ let handle_action game col act =
             b_vel = init_velocity target_loc pl1.p_pos cBUBBLE_SPEED;
             b_accel = if (magnitude accel) < cACCEL_LIMIT then accel else (0., 0.); b_radius = cBUBBLE_RADIUS; 
             b_color = Red})::bl in 
-            let newgdata = (tr, tb, ul, newbulletlst, pwl) in 
+            let newgdata = (tr, tb, ul, newbulletlst, pwl) in
             game.game_d <- newgdata; game
           | Trail -> trail_creator game col accel target_loc; game
           | Spread -> spread_creator game col accel target_loc; game

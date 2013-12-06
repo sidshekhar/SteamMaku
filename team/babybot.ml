@@ -37,13 +37,13 @@ let bot c =
     let d = rand_direction () in
     let l = rand_loc () in
     let () = send_action (Move [d;d;d;d]) in
-    (*let () = if !count mod 4 = 0 then
+    let () = if !count mod 4 = 0 then
       send_action (Shoot (Spread, l, (rand_accel()))) else () in
     let () = if !count mod 20 = 0 then
       send_action (Shoot (Bubble, l, (rand_accel()))) else () in
     let () = if !count mod 20 = 10 then
       send_action (Shoot (Trail, l, (rand_accel()))) else () in
-    let () = if (!count mod 30 = 25 && c = Red) then
+   (* let () = if (!count mod 30 = 25 && c = Red) then
       send_action (Bomb) in
     let () = if (!count mod 30 = 10 && c = Blue) then
       send_action (Bomb) in 
