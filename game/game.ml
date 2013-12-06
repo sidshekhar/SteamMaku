@@ -48,7 +48,7 @@ let pop_direction dirlist col : (direction * direction) =
             else begin current_dirs.p_blue <- t; h end
 
 
-let showPlayer p = 
+let showPlayer p =
   "{id = " ^ (string_of_int p.p_id) ^ ",\n" ^ "position = " ^ 
   (string_of_vector p.p_pos) ^
   ",\n" ^ "focused = " ^ (string_of_bool p.p_focused) ^ ",\n" ^
@@ -95,8 +95,8 @@ let handle_time game =
   let result = check_game_ended game in
   game.time_passed <- game.time_passed +. cUPDATE_TIME;
   
-  let new_tr = (l1,b1,s1,pw1,c1,new_pr) in
-  let new_tb = (l2,b2,s2,pw2,c2,new_pb) in
+  let new_tr = (l1,b1,s1,pw1,update_charge tr Red,new_pr) in
+  let new_tb = (l2,b2,s2,pw2,update_charge tb Blue,new_pb) in
   let new_gdata = (new_tr, new_tb, ul, bl, pwl) in
   game.game_d <- new_gdata;
   current_game.game_d <- game.game_d;
@@ -131,7 +131,7 @@ let handle_action game col act =
             let newgdata = (tr, tb, ul, newbulletlst, pwl) in 
             game.game_d <- newgdata; game
           | Trail -> trail_creator game col accel target_loc; game
-          | Spread -> failwith ""
+          | Spread -> spread_creator game col accel target_loc; game
         end
      else begin match shot_type with
           | Bubble -> let newbulletlst = ({
@@ -144,7 +144,7 @@ let handle_action game col act =
             let newgdata = (tr, tb, ul, newbulletlst, pwl) in 
             game.game_d <- newgdata; game
           | Trail -> trail_creator game col accel target_loc; game
-          | Spread -> failwith ""
+          | Spread -> spread_creator game col accel target_loc; game
           end
 
   | Focus b -> let (rd,bl) = game.invincible in

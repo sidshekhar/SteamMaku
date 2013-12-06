@@ -32,6 +32,9 @@ val update_UFOs: ufo list -> unit
 (* update positions of all players, taking into account their desired direction and movement mode *)
 val update_players: player_char -> (direction * direction) -> player_char
 
+(* updates the players' charge every timestep, returns the new charge *)
+val update_charge: team_data -> color -> int
+
 (* compile a list of all bullet/player collisions (including grazes) *)
 val collide_bullets_players: bullet list -> player_char -> (bullet * player_char * bool) list
 
@@ -65,3 +68,5 @@ val init_velocity_spread: position -> position -> int -> int -> velocity
 
 (* creates a list of spread bullets and returns the new game data *)
 val trail_creator: game -> color -> vector -> vector -> unit
+
+val spread_creator: game -> color -> vector -> vector -> unit
