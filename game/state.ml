@@ -71,12 +71,16 @@ let update_UFOs u_list = ()
 
 
 let update_players p dir = 
-  if p.p_focused
-    then let vect = vector_of_dirs dir (float_of_int cFOCUSED_SPEED) in
-    {p with p_pos = (add_v p.p_pos vect)}
-  else
-    let vect = vector_of_dirs dir (float_of_int cUNFOCUSED_SPEED) in
-    {p with p_pos = (add_v p.p_pos vect)}
+  begin
+    if p.p_focused
+      then let vect = vector_of_dirs dir (float_of_int cFOCUSED_SPEED) in
+      if in_bounds (add_v p.p_pos vect) then {p with p_pos = (add_v p.p_pos vect)}
+      else p
+    else
+      let vect = vector_of_dirs dir (float_of_int cUNFOCUSED_SPEED) in
+      if in_bounds (add_v p.p_pos vect) then {p with p_pos = (add_v p.p_pos vect)}
+      else p
+  end
 
 
 let update_charge team color =
