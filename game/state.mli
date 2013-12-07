@@ -11,6 +11,8 @@ type game = {
   mutable game_d: game_data;
   mutable directions: dirs;
   mutable invincible: (bool * bool); (* (red,blue) *)
+  mutable invincible_for: (float * float);
+  mutable invincible_frames: (float * float);
   mutable time_passed: float
 }
 
@@ -45,13 +47,16 @@ val collide_bullets_UFOs: bullet list -> ufo list -> (bullet * ufo) list
 val process_UFO_hits: game -> (bullet * ufo) list -> unit
 
 (* process each player hit, add graze points for grazes *)
-val process_player_hits: game -> (bullet * player_char * bool) list -> unit
+val process_player_hits: game -> (bullet * player_char * bool) list -> (int * int * int * int)
 
 (* compile a list of all player/power collisions *)
 val collide_players_power: player_char -> power -> (player_char * power) list
 
 (* check player/power collisions, process power collection *)
 val process_player_power: unit -> unit
+
+(* clears the screen of all bullets *)
+val clear_all_bullets: game -> unit
 
 (* check if the game has now ended. Could be by time runnning out or by one player having zero lives left *)
 val check_game_ended: game -> result

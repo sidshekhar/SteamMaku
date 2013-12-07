@@ -43,11 +43,11 @@ let bot c =
       send_action (Shoot (Bubble, l, (rand_accel()))) else () in
     let () = if !count mod 20 = 10 then
       send_action (Shoot (Trail, l, (rand_accel()))) else () in
-   (* let () = if (!count mod 30 = 25 && c = Red) then
+    let () = if (!count mod 30 = 25 && c = Red) then
       send_action (Bomb) in
     let () = if (!count mod 30 = 10 && c = Blue) then
       send_action (Bomb) in 
-    *)
+    
     incr count;
     Thread.delay 0.20
   done
