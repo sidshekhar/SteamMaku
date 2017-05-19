@@ -19,11 +19,36 @@ Game Design project for CS3110 Functional Programming @ Cornell University
 * Philip Kinhasa - https://github.com/downtocode
 
 ### <a name="summary"></a> Summary:
-In this design document, we will go over the instructions on how to run the game first. Then we will go over some of the design and implementation details especially regarding how we treated the state of the game with a different module that we created (apart from the modules given to us). Then we will talk about how we tested our implementation using print statements and especially using the GUI. Finally we will speak about how our program is extensible because of the modules we have in place and of some known problems encountered when using our version of the game.
+
+SteamMaku is a 2-dimensional competitive bullet hell game. Two players move around
+the playing field attempting to hit each other and other moving targets with projectiles. A
+player can win by shooting the other player a specified number of times, or failing that, by
+accumulating the highest score when time runs out.
+All coordinates in this game are indexed as (x; y), where (0; 0) is the top-left corner, the
+x-coordinate increases to the right, and the y coordinate increases downward. The playing
+field has size cBOARD WIDTH by cBOARD HEIGHT.
+The game lasts cTIME LIMIT seconds, and one timestep elapses every cUPDATE TIME
+seconds. These two are the only time quantities that are given in seconds; the rest are all
+given in timesteps.
+There are three types of objects in this game: player characters, bullets, and UFOs (unidentified
+flying2 objects). Each of these objects will be described in more detail within their
+own section, but they all they all share some attributes. The first is an ID, which is just a
+unique number assigned to every object in the game, for purposes of communication with
+the GUI. The second is a position, which is where that object is on the playing field. The
+third is hit radius, which is how large that object is; specifically, this is what is used to
+determine whether two objects are in collision.
 
 ### <a name="instructions"></a> Instructions:
-To compile our game we just use the make Game command. Then we run the java so we can do make GUI. Then, after we press connect on the GUI, we run the two bots with the localhost and port number as arguments. We do this having four terminals open in the correct directory and typing in the following commands in each respectively (according to the above steps):./game.exe
-java -jar gui_client.jar ./botname.exe localhost 10500 ./botname.exe localhost 10500
+To compile our game we just use the make Game command. Then we run the java so we can do make GUI. Then, after we press connect on the GUI, we run the two bots with the localhost and port number as arguments. We do this having four terminals open in the correct directory and typing in the following commands in each respectively:  
+```
+./game.exe  
+java -jar  
+gui_client.jar  
+./botname.exe  
+localhost 10500  
+./botname.exe  
+localhost 10500 
+```
 
 ### <a name="design-and-implementation"></a> Design and Implementation:
 Modules: We used most of the modules that were given to us such as Game, Util, Connection, Definitions, and Constants – from which we used different functions. The only provided module where we actually implemented the game was in Game where we updates handle_action and handle_time to deal with advancing the state of the game for every timestep in handle_time and changing the state of the game to reflect actions taken in handle_action. To store all the helper functions of handle_action and handle_time and to keep track of game data and team data, we created another module called State. Most importantly, we defined the type game in the Game module to equal the type game from the State module, which held mutable types for game data (game_d), directions, whether or not the players were invincible, and how much time had passed.
